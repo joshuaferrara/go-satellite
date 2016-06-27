@@ -1,6 +1,6 @@
 # satellite
 --
-    import "."
+    import "github.com/joshuaferrara/go-satellite"
 
 
 ## Usage
