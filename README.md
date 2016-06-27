@@ -3,6 +3,8 @@
 
 ## Intro
 
+[![Build Status](https://travis-ci.org/joshuaferrara/go-satellite.svg?branch=master)](https://travis-ci.org/joshuaferrara/go-satellite)
+
 I decided to port the SGP4 library to GoLang as one of my first projects with the language. I've included a test suite to ensure accuracy.
 
 ## Usage
