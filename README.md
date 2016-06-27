@@ -1,5 +1,4 @@
 # satellite
---
     import "github.com/joshuaferrara/go-satellite"
 
 
@@ -60,50 +59,6 @@ func ThetaG_JD(jday float64) (ret float64)
 Calculate GMST from Julian date. Reference: The 1992 Astronomical Almanac, page
 B6.
 
-#### type DSComResults
-
-```go
-type DSComResults struct {
-}
-```
-
-A struct returned from the dscom function
-
-#### type DeepSpaceInitResult
-
-```go
-type DeepSpaceInitResult struct {
-}
-```
-
-A struct returned from the dsinit function
-
-#### type DeepSpaceResult
-
-```go
-type DeepSpaceResult struct {
-}
-```
-
-A struct returned from the dspace function
-
-#### type DpperResult
-
-```go
-type DpperResult struct {
-}
-```
-
-A struct returned from the dpper function
-
-#### type GravConst
-
-```go
-type GravConst struct {
-}
-```
-
-Holds variables that are dependent upon selected gravity model
 
 #### type LatLong
 
