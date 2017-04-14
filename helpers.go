@@ -33,11 +33,11 @@ func ParseTLE(line1, line2, gravconst string) (sat Satellite) {
 	sat.Line1 = line1
 	sat.Line2 = line2
 
-	sat.error = 0
+	sat.Error = 0
 	sat.whichconst = getGravConst(gravconst)
 
 	// LINE 1 BEGIN
-	sat.satnum = parseInt(line1[2:7])
+	sat.satnum = parseInt(strings.TrimSpace(line1[2:7]))
 	sat.epochyr = parseInt(line1[18:20])
 	sat.epochdays = parseFloat(line1[20:32])
 

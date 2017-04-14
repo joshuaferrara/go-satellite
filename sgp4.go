@@ -1,7 +1,6 @@
 package satellite
 
 import (
-	"log"
 	"math"
 )
 
@@ -34,7 +33,7 @@ func sgp4init(opsmode *string, epoch float64, satrec *Satellite) (position, velo
 	satrec.con41 = con41
 	satrec.gsto = gsto
 
-	satrec.error = 0
+	satrec.Error = 0
 
 	if omeosq >= 0.0 || satrec.no >= 0.0 {
 		satrec.isimp = 0
@@ -317,8 +316,8 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	vkmpersec := radiusearthkm * xke / 60.0
 
 	satrec.t = tsince
-	satrec.error = 0
-	// TODO: satrec.error_message    = nil
+	satrec.Error = 0
+	// TODO: satrec.Error_message    = nil
 
 	xmdf = satrec.mo + satrec.mdot*satrec.t
 	var argpdf = satrec.argpo + satrec.argpdot*satrec.t
@@ -363,8 +362,8 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	}
 
 	if nm < 0.0 {
-		satrec.error = 2
-		log.Fatal("Mean motion is less than zero")
+		satrec.Error = 2
+		satrec.ErrorStr = ("Mean motion is less than zero")
 	}
 
 	am = math.Pow((xke/nm), x2o3) * tempa * tempa
@@ -372,8 +371,8 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	em = em - tempe
 
 	if em >= 1.0 || em < -0.001 {
-		satrec.error = 1
-		log.Fatal("mean eccentricity not within range 0.0 <= e < 1.0")
+		satrec.Error = 1
+		satrec.ErrorStr = ("mean eccentricity not within range 0.0 <= e < 1.0")
 	}
 
 	if em < 1.0e-6 {
@@ -416,8 +415,8 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 		}
 
 		if ep < 0.0 || ep > 1.0 {
-			satrec.error = 3
-			log.Fatal("perturbed eccentricity not within range 0.0 <= e <= 1.0")
+			satrec.Error = 3
+			satrec.ErrorStr = ("perturbed eccentricity not within range 0.0 <= e <= 1.0")
 		}
 	}
 
@@ -464,8 +463,8 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	pl = am * (1.0 - el2)
 
 	if pl < 0.0 {
-		satrec.error = 4
-		log.Fatal("semilatus rectum is less than zero")
+		satrec.Error = 4
+		satrec.ErrorStr = ("semilatus rectum is less than zero")
 	} else {
 		rl = am * (1.0 - ecose)
 		rdotl = math.Sqrt(am) * esine / rl
@@ -522,8 +521,8 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	}
 
 	if mrt < 1.0 {
-		satrec.error = 6
-		log.Fatal("mrt is less than 1.0 indicating the satellite has decayed")
+		satrec.Error = 6
+		satrec.ErrorStr = ("mrt is less than 1.0 indicating the satellite has decayed")
 	}
 
 	return
