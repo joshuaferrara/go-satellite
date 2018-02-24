@@ -258,10 +258,10 @@ func initl(satn int64, grav GravConst, ecco, epoch, inclo, noIn float64, methodI
 
 	ak = math.Pow(grav.xke/noIn, x2o3)
 	d1 = 0.75 * grav.j2 * (3.0*cosio2 - 1.0) / (rteosq * omeosq)
-	del_ := d1 / (ak * ak)
-	adel = ak * (1.0 - del_*del_ - del_*(1.0/3.0+134.0*del_*del_/81.0))
-	del_ = d1 / (adel * adel)
-	no = noIn / (1.0 + del_)
+	del := d1 / (ak * ak)
+	adel = ak * (1.0 - del*del - del*(1.0/3.0+134.0*del*del/81.0))
+	del = d1 / (adel * adel)
+	no = noIn / (1.0 + del)
 
 	ao = math.Pow(grav.xke/no, x2o3)
 	sinio = math.Sin(inclo)
@@ -291,7 +291,7 @@ func initl(satn int64, grav GravConst, ecco, epoch, inclo, noIn float64, methodI
 	return
 }
 
-// Calculates position and velocity vectors for given time
+// Propagate computes position and velocity vectors for given time.
 func Propagate(sat Satellite, year int, month int, day, hours, minutes, seconds int) (position, velocity Vector3) {
 	j := JDay(year, month, day, hours, minutes, seconds)
 	m := (j - sat.jdsatepoch) * 1440

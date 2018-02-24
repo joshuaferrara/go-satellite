@@ -4,12 +4,12 @@ import (
 	"math"
 )
 
-// A struct returned from the dsinit function
+// DeepSpaceInitResult is the struct returned from the dsinit function
 type DeepSpaceInitResult struct {
 	em, argpm, inclm, mm, nm, nodem, irez, atime, d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421, d5433, dedt, didt, dmdt, dndt, dnodt, domdt, del1, del2, del3, xfact, xlamo, xli, xni float64
 }
 
-// A struct returned from the dspace function
+// DeepSpaceResult is the struct returned from the dspace function
 type DeepSpaceResult struct {
 	atime, em, argpm, inclm, xli, mm, xni, nodem, dndt, nm float64
 }
@@ -314,7 +314,7 @@ func dspace(irez, d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421,
 	return
 }
 
-// A struct returned from the dpper function
+// DpperResult is the struct returned from the dpper function
 type DpperResult struct {
 	ep, inclp, nodep, argpp, mp float64
 }
@@ -454,7 +454,7 @@ func dpper(satrec *Satellite, inclo float64, init string, ep, inclp, nodep, argp
 	return
 }
 
-// A struct returned from the dscom function
+// DSComResults is the struct returned from the dscom function
 type DSComResults struct {
 	snodm, cnodm, sinim, cosim, sinomm, cosomm, day, e3, ee2, em, emsq, gam, peo, pgho, pho, pinco, plo, rtemsq, se2, se3, sgh2, sgh3, sgh4, sh2, sh3, si2, si3, sl2, sl3, sl4, s1, s2, s3, s4, s5, s6, s7, ss1, ss2, ss3, ss4, ss5, ss6, ss7, sz1, sz2, sz3, sz11, sz12, sz13, sz21, sz22, sz23, sz31, sz32, sz33, xgh2, xgh3, xgh4, xh2, xh3, xi2, xi3, xl2, xl3, xl4, nm, z1, z2, z3, z11, z12, z13, z21, z22, z23, z31, z32, z33, zmol, zmos float64
 }

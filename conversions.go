@@ -9,7 +9,7 @@ import (
 func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) {
 	lmonth := [12]int{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
-	if year % 4 == 0 {
+	if year%4 == 0 {
 		lmonth = [12]int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 	}
 
@@ -20,7 +20,7 @@ func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) 
 
 	for dayofyr > inttemp+float64(lmonth[int(i-1)]) && i < 22 {
 		inttemp = inttemp + float64(lmonth[int(i-1)])
-		i += 1
+		i++
 	}
 
 	mon = i
@@ -37,8 +37,8 @@ func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) 
 	return
 }
 
-// Calc julian date given year, month, day, hour, minute and second
-// the julian date is defined by each elapsed day since noon, jan 1, 4713 bc.
+// JDay calculates julian date given year, month, day, hour, minute and second.
+// The julian date is defined by each elapsed day since noon, jan 1, 4713 bc. No leap second is taken into account.
 func JDay(year, mon, day, hr, min, sec int) float64 {
 	return (367.0*float64(year) - math.Floor((7*(float64(year)+math.Floor((float64(mon)+9)/12.0)))*0.25) + math.Floor(275*float64(mon)/9.0) + float64(day) + 1721013.5 + ((float64(sec)/60.0+float64(min))/60.0+float64(hr))/24.0)
 }
@@ -56,13 +56,13 @@ func gstime(jdut1 float64) (temp float64) {
 	return
 }
 
-// Calc GST given year, month, day, hour, minute and second
+// GSTimeFromDate computes GST given year, month, day, hour, minute and second
 func GSTimeFromDate(year, mon, day, hr, min, sec int) float64 {
 	jDay := JDay(year, mon, day, hr, min, sec)
 	return gstime(jDay)
 }
 
-// Convert Earth Centered Inertial coordinated into equivalent latitude, longitude, altitude and velocity.
+// ECIToLLA converts Earth Centered Inertial coordinated into equivalent latitude, longitude, altitude and velocity.
 // Reference: http://celestrak.com/columns/v02n03/
 func ECIToLLA(eciCoords Vector3, gmst float64) (altitude, velocity float64, ret LatLong) {
 	a := 6378.137     // Semi-major Axis
@@ -95,7 +95,7 @@ func ECIToLLA(eciCoords Vector3, gmst float64) (altitude, velocity float64, ret 
 	return
 }
 
-// Convert LatLong in radians to LatLong in degrees
+// LatLongDeg converts LatLong in radians to LatLong in degrees
 func LatLongDeg(rad LatLong) (deg LatLong) {
 	deg.Longitude = math.Mod(rad.Longitude/math.Pi*180, 360)
 	if deg.Longitude > 180 {
@@ -111,9 +111,9 @@ func LatLongDeg(rad LatLong) (deg LatLong) {
 	return
 }
 
-// Calculate GMST from Julian date.
+// ThetaGJD calculates GMST from Julian date.
 // Reference: The 1992 Astronomical Almanac, page B6.
-func ThetaG_JD(jday float64) (ret float64) {
+func ThetaGJD(jday float64) (ret float64) {
 	UT := jday + 0.5 - jday
 	jday = jday - UT
 	TU := (jday - 2451545.0) / 36525.0
@@ -123,11 +123,11 @@ func ThetaG_JD(jday float64) (ret float64) {
 	return
 }
 
-// Convert latitude, longitude and altitude into equivalent Earth Centered Intertial coordinates
+// LLAToECI converts latitude, longitude and altitude into equivalent Earth Centered Intertial coordinates.
 // Reference: The 1992 Astronomical Almanac, page K11.
 func LLAToECI(obsCoords LatLong, alt, jday float64) (eciObs Vector3) {
 	re := 6378.137
-	theta := math.Mod(ThetaG_JD(jday)+obsCoords.Longitude, TWOPI)
+	theta := math.Mod(ThetaGJD(jday)+obsCoords.Longitude, TWOPI)
 	r := (re + alt) * math.Cos(obsCoords.Latitude)
 	eciObs.X = r * math.Cos(theta)
 	eciObs.Y = r * math.Sin(theta)
@@ -135,20 +135,20 @@ func LLAToECI(obsCoords LatLong, alt, jday float64) (eciObs Vector3) {
 	return
 }
 
-// Convert Earth Centered Intertial coordinates into Earth Cenetered Earth Final coordinates
+// ECIToECEF converts Earth Centered Intertial coordinates into Earth Cenetered Earth Final coordinates.
 // Reference: http://ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
 func ECIToECEF(eciCoords Vector3, gmst float64) (ecfCoords Vector3) {
-	ecfCoords.X = eciCoords.X * math.Cos(gmst) + eciCoords.Y * math.Sin(gmst)
-	ecfCoords.Y = eciCoords.X *-math.Sin(gmst) + eciCoords.Y * math.Cos(gmst)
+	ecfCoords.X = eciCoords.X*math.Cos(gmst) + eciCoords.Y*math.Sin(gmst)
+	ecfCoords.Y = eciCoords.X*-math.Sin(gmst) + eciCoords.Y*math.Cos(gmst)
 	ecfCoords.Z = eciCoords.Z
 	return
 }
 
-// Calculate look angles for given satellite position and observer position
+// ECIToLookAngles calculates look angles for given satellite position and observer position
 // obsAlt in km
 // Reference: http://celestrak.com/columns/v02n02/
 func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64) (lookAngles LookAngles) {
-	gst := ThetaG_JD(jday)
+	gst := ThetaGJD(jday)
 
 	// Convert eciSat to ecf
 	ecefSat := ECIToECEF(eciSat, gst)
@@ -161,13 +161,13 @@ func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64) (l
 	ry := ecefSat.Y - ecefObs.Y
 	rz := ecefSat.Z - ecefObs.Z
 
-	top_s := math.Sin(obsCoords.Latitude) * math.Cos(obsCoords.Longitude) * rx + math.Sin(obsCoords.Latitude) * math.Sin(obsCoords.Longitude) * ry - math.Cos(obsCoords.Latitude) * rz
-	top_e := -math.Sin(obsCoords.Longitude) * rx + math.Cos(obsCoords.Longitude) * ry
-	top_z := math.Cos(obsCoords.Latitude) * math.Cos(obsCoords.Longitude) * rx + math.Cos(obsCoords.Latitude) * math.Sin(obsCoords.Longitude) * ry + math.Sin(obsCoords.Latitude) * rz
+	topS := math.Sin(obsCoords.Latitude)*math.Cos(obsCoords.Longitude)*rx + math.Sin(obsCoords.Latitude)*math.Sin(obsCoords.Longitude)*ry - math.Cos(obsCoords.Latitude)*rz
+	topE := -math.Sin(obsCoords.Longitude)*rx + math.Cos(obsCoords.Longitude)*ry
+	topZ := math.Cos(obsCoords.Latitude)*math.Cos(obsCoords.Longitude)*rx + math.Cos(obsCoords.Latitude)*math.Sin(obsCoords.Longitude)*ry + math.Sin(obsCoords.Latitude)*rz
 
-	lookAngles.Rg = math.Sqrt(top_s*top_s + top_e*top_e + top_z*top_z)
-	lookAngles.Az = math.Atan2(-top_e, top_s) + math.Pi
-	lookAngles.El = math.Asin(top_z / lookAngles.Rg)
+	lookAngles.Rg = math.Sqrt(topS*topS + topE*topE + topZ*topZ)
+	lookAngles.Az = math.Atan2(-topE, topS) + math.Pi
+	lookAngles.El = math.Asin(topZ / lookAngles.Rg)
 
 	return
 }
