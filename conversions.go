@@ -114,7 +114,7 @@ func LatLongDeg(rad LatLong) (deg LatLong) {
 // Calculate GMST from Julian date.
 // Reference: The 1992 Astronomical Almanac, page B6.
 func ThetaG_JD(jday float64) (ret float64) {
-	UT := jday + 0.5 - jday
+	_, UT := math.Modf(jday + 0.5)
 	jday = jday - UT
 	TU := (jday - 2451545.0) / 36525.0
 	GMST := 24110.54841 + TU*(8640184.812866+TU*(0.093104-TU*6.2e-6))
