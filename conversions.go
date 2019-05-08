@@ -9,7 +9,7 @@ import (
 func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) {
 	lmonth := [12]int{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
-	if year % 4 == 0 {
+	if year%4 == 0 {
 		lmonth = [12]int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 	}
 
@@ -138,8 +138,8 @@ func LLAToECI(obsCoords LatLong, alt, jday float64) (eciObs Vector3) {
 // Convert Earth Centered Intertial coordinates into Earth Cenetered Earth Final coordinates
 // Reference: http://ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
 func ECIToECEF(eciCoords Vector3, gmst float64) (ecfCoords Vector3) {
-	ecfCoords.X = eciCoords.X * math.Cos(gmst) + eciCoords.Y * math.Sin(gmst)
-	ecfCoords.Y = eciCoords.X *-math.Sin(gmst) + eciCoords.Y * math.Cos(gmst)
+	ecfCoords.X = eciCoords.X*math.Cos(gmst) + eciCoords.Y*math.Sin(gmst)
+	ecfCoords.Y = eciCoords.X*-math.Sin(gmst) + eciCoords.Y*math.Cos(gmst)
 	ecfCoords.Z = eciCoords.Z
 	return
 }
@@ -148,25 +148,25 @@ func ECIToECEF(eciCoords Vector3, gmst float64) (ecfCoords Vector3) {
 // obsAlt in km
 // Reference: http://celestrak.com/columns/v02n02/
 func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64) (lookAngles LookAngles) {
-	gst := ThetaG_JD(jday)
+	theta := math.Mod(ThetaG_JD(jday)+obsCoords.Longitude, 2*math.Pi)
+	obsPos := LLAToECI(obsCoords, obsAlt, jday)
 
-	// Convert eciSat to ecf
-	ecefSat := ECIToECEF(eciSat, gst)
+	rx := eciSat.X - obsPos.X
+	ry := eciSat.Y - obsPos.Y
+	rz := eciSat.Z - obsPos.Z
 
-	// Convert obsCoords to ecf
-	// LLA -> ECI -> ECEF
-	ecefObs := ECIToECEF(LLAToECI(obsCoords, obsAlt, gst), gst)
+	top_s := math.Sin(obsCoords.Latitude)*math.Cos(theta)*rx + math.Sin(obsCoords.Latitude)*math.Sin(theta)*ry - math.Cos(obsCoords.Latitude)*rz
+	top_e := -math.Sin(theta)*rx + math.Cos(theta)*ry
+	top_z := math.Cos(obsCoords.Latitude)*math.Cos(theta)*rx + math.Cos(obsCoords.Latitude)*math.Sin(theta)*ry + math.Sin(obsCoords.Latitude)*rz
 
-	rx := ecefSat.X - ecefObs.X
-	ry := ecefSat.Y - ecefObs.Y
-	rz := ecefSat.Z - ecefObs.Z
-
-	top_s := math.Sin(obsCoords.Latitude) * math.Cos(obsCoords.Longitude) * rx + math.Sin(obsCoords.Latitude) * math.Sin(obsCoords.Longitude) * ry - math.Cos(obsCoords.Latitude) * rz
-	top_e := -math.Sin(obsCoords.Longitude) * rx + math.Cos(obsCoords.Longitude) * ry
-	top_z := math.Cos(obsCoords.Latitude) * math.Cos(obsCoords.Longitude) * rx + math.Cos(obsCoords.Latitude) * math.Sin(obsCoords.Longitude) * ry + math.Sin(obsCoords.Latitude) * rz
-
-	lookAngles.Rg = math.Sqrt(top_s*top_s + top_e*top_e + top_z*top_z)
-	lookAngles.Az = math.Atan2(-top_e, top_s) + math.Pi
+	lookAngles.Az = math.Atan(-top_e / top_s)
+	if top_s > 0 {
+		lookAngles.Az = lookAngles.Az + math.Pi
+	}
+	if lookAngles.Az < 0 {
+		lookAngles.Az = lookAngles.Az + 2*math.Pi
+	}
+	lookAngles.Rg = math.Sqrt(rx*rx + ry*ry + rz*rz)
 	lookAngles.El = math.Asin(top_z / lookAngles.Rg)
 
 	return
