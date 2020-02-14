@@ -4,12 +4,12 @@ import (
 	"math"
 )
 
-// A struct returned from the dsinit function
+// DeepSpaceInitResult a struct returned from the dsinit function
 type DeepSpaceInitResult struct {
 	em, argpm, inclm, mm, nm, nodem, irez, atime, d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421, d5433, dedt, didt, dmdt, dndt, dnodt, domdt, del1, del2, del3, xfact, xlamo, xli, xni float64
 }
 
-// A struct returned from the dspace function
+// DeepSpaceResult a struct returned from the dspace function
 type DeepSpaceResult struct {
 	atime, em, argpm, inclm, xli, mm, xni, nodem, dndt, nm float64
 }
@@ -34,7 +34,6 @@ func dsinit(whichconst GravConst, cosim, emsq, argpo, s1, s2, s3, s4, s5, sinim,
 
 	xke := whichconst.xke
 
-	irez = 0
 	if 0.0034906585 < nm && nm < 0.0052359877 {
 		irez = 1
 	}
@@ -74,7 +73,7 @@ func dsinit(whichconst GravConst, cosim, emsq, argpo, s1, s2, s3, s4, s5, sinim,
 	}
 
 	dndt := 0.0
-	theta = math.Mod(gsto+tc*rptim, TWOPI)
+	theta = math.Mod(gsto+tc*rptim, twoPi)
 	em = em + dedt*t
 	inclm = inclm + didt*t
 	argpm = argpm + domdt*t
@@ -154,7 +153,7 @@ func dsinit(whichconst GravConst, cosim, emsq, argpo, s1, s2, s3, s4, s5, sinim,
 			temp = 2.0 * temp1 * root54
 			d5421 = temp * f542 * g521
 			d5433 = temp * f543 * g533
-			xlamo = math.Mod(mo+nodeo+nodeo-theta-theta, TWOPI)
+			xlamo = math.Mod(mo+nodeo+nodeo-theta-theta, twoPi)
 			xfact = mdot + dmdt + 2.0*(nodedot+dnodt-rptim) - no
 			em = emo
 			emsq = emsqo
@@ -171,7 +170,7 @@ func dsinit(whichconst GravConst, cosim, emsq, argpo, s1, s2, s3, s4, s5, sinim,
 			del2 = 2.0 * del1 * f220 * g200 * q22
 			del3 = 3.0 * del1 * f330 * g300 * q33 * aonv
 			del1 = del1 * f311 * g310 * q31 * aonv
-			xlamo = math.Mod(mo+nodeo+argpo-theta, TWOPI)
+			xlamo = math.Mod(mo+nodeo+argpo-theta, twoPi)
 			xfact = mdot + xpidot - rptim + dmdt + domdt + dnodt - no
 		}
 		xli = xlamo
@@ -233,7 +232,7 @@ func dspace(irez, d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421,
 	step2 := 259200.0
 
 	dndt := 0.0
-	theta = math.Mod((gsto + tc*rptim), TWOPI)
+	theta = math.Mod((gsto + tc*rptim), twoPi)
 	em = em + dedt*t
 
 	inclm = inclm + didt*t
@@ -314,7 +313,7 @@ func dspace(irez, d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421,
 	return
 }
 
-// A struct returned from the dpper function
+// DpperResult a struct returned from the dpper function
 type DpperResult struct {
 	ep, inclp, nodep, argpp, mp float64
 }
@@ -423,21 +422,21 @@ func dpper(satrec *Satellite, inclo float64, init string, ep, inclp, nodep, argp
 
 			alfdp = alfdp + dalf
 			betdp = betdp + dbet
-			nodep = math.Mod(nodep, TWOPI)
+			nodep = math.Mod(nodep, twoPi)
 			if nodep < 0.0 && opsmode == "a" {
-				nodep = nodep + TWOPI
+				nodep = nodep + twoPi
 			}
 			xls := mp + argpp + pl + pgh + (cosip-pinc*sinip)*nodep
 			xnoh := nodep
 			nodep = math.Atan2(alfdp, betdp)
 			if nodep < 0.0 && opsmode == "a" {
-				nodep = nodep + TWOPI
+				nodep = nodep + twoPi
 			}
 			if math.Abs(xnoh-nodep) > math.Pi {
 				if nodep < xnoh {
-					nodep = nodep + TWOPI
+					nodep = nodep + twoPi
 				} else {
-					nodep = nodep - TWOPI
+					nodep = nodep - twoPi
 				}
 			}
 			mp += pl
@@ -454,7 +453,7 @@ func dpper(satrec *Satellite, inclo float64, init string, ep, inclp, nodep, argp
 	return
 }
 
-// A struct returned from the dscom function
+// DSComResults a struct returned from the dscom function
 type DSComResults struct {
 	snodm, cnodm, sinim, cosim, sinomm, cosomm, day, e3, ee2, em, emsq, gam, peo, pgho, pho, pinco, plo, rtemsq, se2, se3, sgh2, sgh3, sgh4, sh2, sh3, si2, si3, sl2, sl3, sl4, s1, s2, s3, s4, s5, s6, s7, ss1, ss2, ss3, ss4, ss5, ss6, ss7, sz1, sz2, sz3, sz11, sz12, sz13, sz21, sz22, sz23, sz31, sz32, sz33, xgh2, xgh3, xgh4, xh2, xh3, xi2, xi3, xl2, xl3, xl4, nm, z1, z2, z3, z11, z12, z13, z21, z22, z23, z31, z32, z33, zmol, zmos float64
 }
@@ -490,7 +489,7 @@ func dscom(epoch, ep, argpp, tc, inclp, nodep, np, e3, ee2, peo, pgho, pho, pinc
 	pgho = 0.0
 	pho = 0.0
 	day := epoch + 18261.5 + tc/1440.0
-	xnodce = math.Mod(4.5236020-9.2422029e-4*day, TWOPI)
+	xnodce = math.Mod(4.5236020-9.2422029e-4*day, twoPi)
 	stem = math.Sin(xnodce)
 	ctem = math.Cos(xnodce)
 	zcosil = 0.91375164 - 0.03568096*ctem
@@ -588,8 +587,8 @@ func dscom(epoch, ep, argpp, tc, inclp, nodep, np, e3, ee2, peo, pgho, pho, pinc
 		}
 	}
 
-	zmol = math.Mod(4.7199672+0.22997150*day-gam, TWOPI)
-	zmos = math.Mod(6.2565837+0.017201977*day, TWOPI)
+	zmol = math.Mod(4.7199672+0.22997150*day-gam, twoPi)
+	zmos = math.Mod(6.2565837+0.017201977*day, twoPi)
 
 	se2 = 2.0 * ss1 * ss6
 	se3 = 2.0 * ss1 * ss7

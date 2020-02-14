@@ -12,19 +12,15 @@ I decided to port the SGP4 library to GoLang as one of my first projects with th
 #### Constants
 
 ```go
-const DEG2RAD float64 = math.Pi / 180.0
+const deg2rad float64 = math.Pi / 180.0
 ```
 
 ```go
-const RAD2DEG float64 = 180.0 / math.Pi
+const twopi float64 = math.Pi * 2.0
 ```
 
 ```go
-const TWOPI float64 = math.Pi * 2.0
-```
-
-```go
-const XPDOTP float64 = 1440.0 / (2.0 * math.Pi)
+const xPDOTP float64 = 1440.0 / (2.0 * math.Pi)
 ```
 
 #### func  ECIToLLA
@@ -57,10 +53,10 @@ func Propagate(sat Satellite, year int, month int, day, hours, minutes, seconds 
 ```
 Calculates position and velocity vectors for given time
 
-#### func  ThetaG_JD
+#### func  ThetaGFromJulianDate
 
 ```go
-func ThetaG_JD(jday float64) (ret float64)
+func ThetaGFromJulianDate(jday float64) (ret float64)
 ```
 Calculate GMST from Julian date. Reference: The 1992 Astronomical Almanac, page
 B6.
