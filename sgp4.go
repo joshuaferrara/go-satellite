@@ -194,12 +194,6 @@ func sgp4init(opsmode *string, epoch float64, satrec *Satellite) (position, velo
 
 			dsinitResults := dsinit(satrec.whichconst, cosim, emsq, satrec.argpo, s1, s2, s3, s4, s5, sinim, ss1, ss2, ss3, ss4, ss5, sz1, sz3, sz11, sz13, sz21, sz23, sz31, sz33, satrec.t, tc, satrec.gsto, satrec.mo, satrec.mdot, satrec.no, satrec.nodeo, satrec.nodedot, xpidot, z1, z3, z11, z13, z21, z23, z31, z33, satrec.ecco, eccsq, em, argpm, inclm, mm, nm, nodem, satrec.irez, satrec.atime, satrec.d2201, satrec.d2211, satrec.d3210, satrec.d3222, satrec.d4410, satrec.d4422, satrec.d5220, satrec.d5232, satrec.d5421, satrec.d5433, satrec.dedt, satrec.didt, satrec.dmdt, satrec.dnodt, satrec.domdt, satrec.del1, satrec.del2, satrec.del3, satrec.xfact, satrec.xlamo, satrec.xli, satrec.xni)
 
-			em = dsinitResults.em
-			argpm = dsinitResults.argpm
-			inclm = dsinitResults.inclm
-			mm = dsinitResults.mm
-			nm = dsinitResults.nm
-			nodem = dsinitResults.nodem
 			satrec.irez = dsinitResults.irez
 			satrec.atime = dsinitResults.atime
 			satrec.d2201 = dsinitResults.d2201
@@ -279,10 +273,10 @@ func initl(satn int64, grav GravConst, ecco, epoch, inclo, noIn float64, methodI
 		c1 := 1.72027916940703639e-2
 		thgr70 := 1.7321343856509374
 		fk5r := 5.07551419432269442e-15
-		c1p2p := c1 + TWOPI
-		gsto = math.Mod((thgr70 + c1*ds70 + c1p2p*tfrac + ts70*ts70*fk5r), TWOPI)
+		c1p2p := c1 + twoPi
+		gsto = math.Mod((thgr70 + c1*ds70 + c1p2p*tfrac + ts70*ts70*fk5r), twoPi)
 		if gsto < 0.0 {
-			gsto = gsto + TWOPI
+			gsto = gsto + twoPi
 		}
 	} else {
 		gsto = gstime(epoch + 2433281.5)
@@ -302,7 +296,7 @@ func Propagate(sat Satellite, year int, month int, day, hours, minutes, seconds 
 // satrec - initialized Satellite struct from sgp4init
 // tsince - time since epoch in minutes
 func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
-	var am, axnl, aynl, betal, cosim, sinim, cnod, snod, cos2u, sin2u, coseo1, sineo1, cosi, sini, cosip, sinip, cosisq, cossu, sinsu, cosu, sinu, delm, delomg, emsq, ecose, el2, eo1, esine, argpm, argpp, pl, rdotl, rl, rvdot, rvdotl, su, t2, t3, t4, tc, tem5, temp, temp1, temp2, tempa, tempe, templ, u, ux, uy, uz, vx, vy, vz, inclm, mm, nm, nodem, xinc, xincp, xl, xlm, mp, xmdf, xmx, xmy, nodedf, xnode, nodep, mrt float64
+	var am, axnl, aynl, betal, cosim, sinim, cnod, snod, cos2u, sin2u, coseo1, sineo1, cosi, sini, cosip, sinip, cosisq, cossu, sinsu, cosu, sinu, delm, delomg, ecose, el2, eo1, esine, argpm, argpp, pl, rdotl, rl, rvdot, rvdotl, su, t2, t3, t4, tc, tem5, temp, temp1, temp2, tempa, tempe, templ, u, ux, uy, uz, vx, vy, vz, inclm, mm, nm, nodem, xinc, xincp, xl, xlm, mp, xmdf, xmx, xmy, nodedf, xnode, nodep, mrt float64
 
 	mrt = 0.0
 	temp4 := 1.5e-12
@@ -380,13 +374,11 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	}
 	mm = mm + satrec.no*templ
 	xlm = mm + argpm + nodem
-	emsq = em * em
-	temp = 1.0 - emsq
 
-	nodem = math.Mod(nodem, TWOPI)
-	argpm = math.Mod(argpm, TWOPI)
-	xlm = math.Mod(xlm, TWOPI)
-	mm = math.Mod((xlm - argpm - nodem), TWOPI)
+	nodem = math.Mod(nodem, twoPi)
+	argpm = math.Mod(argpm, twoPi)
+	xlm = math.Mod(xlm, twoPi)
+	mm = math.Mod((xlm - argpm - nodem), twoPi)
 
 	sinim = math.Sin(inclm)
 	cosim = math.Cos(inclm)
@@ -436,7 +428,7 @@ func sgp4(satrec *Satellite, tsince float64) (position, velocity Vector3) {
 	aynl = ep*math.Sin(argpp) + temp*satrec.aycof
 	xl = mp + argpp + nodep + temp*satrec.xlcof*axnl
 
-	u = math.Mod((xl - nodep), TWOPI)
+	u = math.Mod((xl - nodep), twoPi)
 	eo1 = u
 	tem5 = 9999.9
 	ktr := 1
