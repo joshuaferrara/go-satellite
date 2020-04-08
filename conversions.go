@@ -123,7 +123,7 @@ func ThetaG_JD(jday float64) (ret float64) {
 	return
 }
 
-// Convert latitude, longitude and altitude into equivalent Earth Centered Intertial coordinates
+// Convert latitude, longitude and altitude(km) into equivalent Earth Centered Intertial coordinates(km)
 // Reference: The 1992 Astronomical Almanac, page K11.
 func LLAToECI(obsCoords LatLong, alt, jday float64) (eciObs Vector3) {
 	re := 6378.137
