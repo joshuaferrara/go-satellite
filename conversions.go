@@ -39,8 +39,10 @@ func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) 
 
 // Calc julian date given year, month, day, hour, minute and second
 // the julian date is defined by each elapsed day since noon, jan 1, 4713 bc.
-func JDay(year, mon, day, hr, min, sec int) float64 {
-	return (367.0*float64(year) - math.Floor((7*(float64(year)+math.Floor((float64(mon)+9)/12.0)))*0.25) + math.Floor(275*float64(mon)/9.0) + float64(day) + 1721013.5 + ((float64(sec)/60.0+float64(min))/60.0+float64(hr))/24.0)
+func JDay(year, mon, day, hr, minute int, sec float64) (float64, float64) {
+	jd := (367.0*float64(year) - math.Floor(7*(float64(year)+math.Floor((float64(mon)+9)/12.0))*0.25) + math.Floor(275*float64(mon)/9.0) + float64(day) + 1721013.5)
+	fr := (sec + float64(minute)*60.0 + float64(hr)*3600.0) / 86400.0
+	return jd, fr
 }
 
 // this function finds the greenwich sidereal time (iau-82)
@@ -57,9 +59,9 @@ func gstime(jdut1 float64) (temp float64) {
 }
 
 // Calc GST given year, month, day, hour, minute and second
-func GSTimeFromDate(year, mon, day, hr, min, sec int) float64 {
-	jDay := JDay(year, mon, day, hr, min, sec)
-	return gstime(jDay)
+func GSTimeFromDate(year, mon, day, hr, min int, sec float64) float64 {
+	jDay, jf := JDay(year, mon, day, hr, min, sec)
+	return gstime(jDay + jf)
 }
 
 // Convert Earth Centered Inertial coordinated into equivalent latitude, longitude, altitude and velocity.
@@ -125,13 +127,17 @@ func ThetaG_JD(jday float64) (ret float64) {
 
 // Convert latitude, longitude and altitude into equivalent Earth Centered Intertial coordinates
 // Reference: The 1992 Astronomical Almanac, page K11.
-func LLAToECI(obsCoords LatLong, alt, jday float64) (eciObs Vector3) {
-	re := 6378.137
+func LLAToECI(obsCoords LatLong, alt, jday float64, gravConst GravConst) (eciObs Vector3) {
 	theta := math.Mod(ThetaG_JD(jday)+obsCoords.Longitude, TWOPI)
-	r := (re + alt) * math.Cos(obsCoords.Latitude)
-	eciObs.X = r * math.Cos(theta)
-	eciObs.Y = r * math.Sin(theta)
-	eciObs.Z = (re + alt) * math.Sin(obsCoords.Latitude)
+	latSin := math.Sin(obsCoords.Latitude)
+	latCos := math.Cos(obsCoords.Latitude)
+	c := 1 / math.Sqrt(1+gravConst.f*(gravConst.f-2)*latSin*latSin)
+	sq := c * (1 - gravConst.f) * (1 - gravConst.f)
+	achcp := (gravConst.radiusearthkm*c + alt) * latCos
+
+	eciObs.X = achcp * math.Cos(theta)
+	eciObs.Y = achcp * math.Sin(theta)
+	eciObs.Z = (gravConst.radiusearthkm*sq + alt) * latSin
 	return
 }
 
@@ -147,27 +153,32 @@ func ECIToECEF(eciCoords Vector3, gmst float64) (ecfCoords Vector3) {
 // Calculate look angles for given satellite position and observer position
 // obsAlt in km
 // Reference: http://celestrak.com/columns/v02n02/
-func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64) (lookAngles LookAngles) {
+func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64, gravConst GravConst) (lookAngles LookAngles) {
 	theta := math.Mod(ThetaG_JD(jday)+obsCoords.Longitude, 2*math.Pi)
-	obsPos := LLAToECI(obsCoords, obsAlt, jday)
+	obsPos := LLAToECI(obsCoords, obsAlt, jday, gravConst)
 
 	rx := eciSat.X - obsPos.X
 	ry := eciSat.Y - obsPos.Y
 	rz := eciSat.Z - obsPos.Z
 
-	top_s := math.Sin(obsCoords.Latitude)*math.Cos(theta)*rx + math.Sin(obsCoords.Latitude)*math.Sin(theta)*ry - math.Cos(obsCoords.Latitude)*rz
-	top_e := -math.Sin(theta)*rx + math.Cos(theta)*ry
-	top_z := math.Cos(obsCoords.Latitude)*math.Cos(theta)*rx + math.Cos(obsCoords.Latitude)*math.Sin(theta)*ry + math.Sin(obsCoords.Latitude)*rz
+	latSin := math.Sin(obsCoords.Latitude)
+	latCos := math.Cos(obsCoords.Latitude)
+	thetaSin := math.Sin(theta)
+	thetaCos := math.Cos(theta)
 
-	lookAngles.Az = math.Atan(-top_e / top_s)
-	if top_s > 0 {
+	topS := latSin*thetaCos*rx + latSin*thetaSin*ry - latCos*rz
+	topE := -thetaSin*rx + thetaCos*ry
+	topZ := latCos*thetaCos*rx + latCos*thetaSin*ry + latSin*rz
+
+	lookAngles.Az = math.Atan(-topE / topS)
+	if topS > 0 {
 		lookAngles.Az = lookAngles.Az + math.Pi
 	}
 	if lookAngles.Az < 0 {
 		lookAngles.Az = lookAngles.Az + 2*math.Pi
 	}
 	lookAngles.Rg = math.Sqrt(rx*rx + ry*ry + rz*rz)
-	lookAngles.El = math.Asin(top_z / lookAngles.Rg)
+	lookAngles.El = math.Asin(topZ / lookAngles.Rg)
 
 	return
 }
