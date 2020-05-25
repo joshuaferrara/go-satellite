@@ -83,9 +83,9 @@ func TLEToSat(line1, line2 string, gravconst string) Satellite {
 
 	mon, day, hr, min, sec := days2mdhms(year, sat.epochdays)
 
-	sat.jdsatepoch = JDay(int(year), int(mon), int(day), int(hr), int(min), int(sec))
+	sat.jdsatepoch, sat.jdsatepochF = JDay(int(year), int(mon), int(day), int(hr), int(min), sec)
 
-	sgp4init(&opsmode, sat.jdsatepoch-2433281.5, &sat)
+	sgp4init(&opsmode, sat.jdsatepoch+sat.jdsatepochF-2433281.5, &sat)
 
 	return sat
 }

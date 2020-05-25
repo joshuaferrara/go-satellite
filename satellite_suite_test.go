@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestSatellite(t *testing.T) {
@@ -20,6 +21,31 @@ type Result struct {
 }
 
 var _ = Describe("go-satellite", func() {
+
+	Describe("LookAngles", func() {
+
+		It("should return correct observer look angles for given ISS#22825 at 2020-05-23T20:23:37", func() {
+			sat := TLEToSat("1 25544U 98067A   20140.34419374 -.00000374  00000-0  13653-5 0  9990", "2 25544  51.6433 131.2277 0001338 330.3524 173.1622 15.49372617227549", "wgs72")
+
+			time := time.Date(2020, 5, 23, 20, 23, 37, 0, time.UTC)
+			year, month, day := time.Date()
+			hour, min, sec := time.Clock()
+
+			jDay, jF := JDay(year, int(month), day, hour, min, float64(sec))
+			pos, _ := Propagate(sat, jDay, jF)
+
+			latLong := LatLong{
+				Latitude:  DEG2RAD * 55.6167,
+				Longitude: DEG2RAD * 12.6500}
+			alt := 0.005
+
+			angles := ECIToLookAngles(pos, latLong, alt, jDay+jF, sat.whichconst)
+
+			Expect(angles.El * RAD2DEG).To(Equal(42.06164214709452))
+			Expect(angles.Az * RAD2DEG).To(Equal(181.2902281625632))
+		})
+	})
+
 	Describe("ParseTLE", func() {
 		It("should return correctly parsed values for given ISS#25544", func() {
 			sat := ParseTLE("1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927", "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537", "wgs84")
@@ -221,7 +247,7 @@ var _ = Describe("go-satellite", func() {
 			PropagationTestCase{
 				line1: "1 23599U 95029B   06171.76535463  .00085586  12891-6  12956-2 0  2905",
 				line2: "2 23599   6.9327   0.2849 5782022 274.4436  25.2425  4.47796565123555",
-				grav: "wgs72",
+				grav:  "wgs72",
 				testData: `0.00000000 9892.63794341 35.76144969 -1.08228838 3.556643237 6.456009375 0.783610890       
 20.00000000 11931.95642997 7340.74973750 886.46365987 0.308329116 5.532328972 0.672887281
 40.00000000 11321.71039205 13222.84749156 1602.40119049 -1.151973982 4.285810871 0.521919425

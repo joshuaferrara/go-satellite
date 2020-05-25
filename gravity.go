@@ -7,7 +7,7 @@ import (
 
 // Holds variables that are dependent upon selected gravity model
 type GravConst struct {
-	mu, radiusearthkm, xke, tumin, j2, j3, j4, j3oj2 float64
+	mu, radiusearthkm, xke, tumin, j2, j3, j4, j3oj2, f float64
 }
 
 // Returns a GravConst with correct information on requested model provided through the name parameter
@@ -22,6 +22,7 @@ func getGravConst(name string) (grav GravConst) {
 		grav.j3 = -0.00000253881
 		grav.j4 = -0.00000165597
 		grav.j3oj2 = grav.j3 / grav.j2
+		grav.f = 1 / 298.26
 	case "wgs72":
 		grav.mu = 398600.8
 		grav.radiusearthkm = 6378.135
@@ -31,6 +32,7 @@ func getGravConst(name string) (grav GravConst) {
 		grav.j3 = -0.00000253881
 		grav.j4 = -0.00000165597
 		grav.j3oj2 = grav.j3 / grav.j2
+		grav.f = 1 / 298.26
 	case "wgs84":
 		grav.mu = 398600.5
 		grav.radiusearthkm = 6378.137
@@ -40,6 +42,7 @@ func getGravConst(name string) (grav GravConst) {
 		grav.j3 = -0.00000253215306
 		grav.j4 = -0.00000161098761
 		grav.j3oj2 = grav.j3 / grav.j2
+		grav.f = 1 / 298.257223563
 	default:
 		log.Fatal(name, "is not a valid gravity model")
 	}

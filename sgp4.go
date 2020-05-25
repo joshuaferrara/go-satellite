@@ -292,10 +292,9 @@ func initl(satn int64, grav GravConst, ecco, epoch, inclo, noIn float64, methodI
 }
 
 // Calculates position and velocity vectors for given time
-func Propagate(sat Satellite, year int, month int, day, hours, minutes, seconds int) (position, velocity Vector3) {
-	j := JDay(year, month, day, hours, minutes, seconds)
-	m := (j - sat.jdsatepoch) * 1440
-	return sgp4(&sat, m)
+func Propagate(sat Satellite, jDay, jF float64) (position, velocity Vector3) {
+	tsince := (jDay-sat.jdsatepoch)*1440 + (jF-sat.jdsatepochF)*1440
+	return sgp4(&sat, tsince)
 }
 
 // this procedure is the sgp4 prediction model from space command. this is an updated and combined version of sgp4 and sdp4, which were originally published separately in spacetrack report #3. this version follows the methodology from the aiaa paper (2006) describing the history and development of the code.

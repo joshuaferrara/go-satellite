@@ -45,7 +45,7 @@ Calc GST given year, month, day, hour, minute and second
 #### func  JDay
 
 ```go
-func JDay(year, mon, day, hr, min, sec int) float64
+func JDay(year, mon, day, hr, min int, sec float64) (float64, float64)
 ```
 Calc julian date given year, month, day, hour, minute and second the julian date
 is defined by each elapsed day since noon, jan 1, 4713 bc.
@@ -53,7 +53,7 @@ is defined by each elapsed day since noon, jan 1, 4713 bc.
 #### func  Propagate
 
 ```go
-func Propagate(sat Satellite, year int, month int, day, hours, minutes, seconds int) (position, velocity Vector3)
+func Propagate(sat Satellite, jDay, jF float64) (position, velocity Vector3)
 ```
 Calculates position and velocity vectors for given time
 
@@ -96,7 +96,7 @@ Holds an azimuth, elevation and range
 #### func  ECIToLookAngles
 
 ```go
-func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64) (lookAngles LookAngles)
+func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64, gravConst GravConst) (lookAngles LookAngles)
 ```
 Calculate look angles for given satellite position and observer position obsAlt
 in km Reference: http://celestrak.com/columns/v02n02/
