@@ -150,12 +150,13 @@ func ECIToECEF(eciCoords Vector3, gmst float64) (ecfCoords Vector3) {
 func ECIToLookAngles(eciSat Vector3, obsCoords LatLong, obsAlt, jday float64) (lookAngles LookAngles) {
 	gst := ThetaGJD(jday)
 
-	// Convert eciSat to ecf
-	ecefSat := ECIToECEF(eciSat, gst)
+	rx := eciSat.X - obsPos.X
+	ry := eciSat.Y - obsPos.Y
+	rz := eciSat.Z - obsPos.Z
 
-	// Convert obsCoords to ecf
-	// LLA -> ECI -> ECEF
-	ecefObs := ECIToECEF(LLAToECI(obsCoords, obsAlt, gst), gst)
+	top_s := math.Sin(obsCoords.Latitude)*math.Cos(theta)*rx + math.Sin(obsCoords.Latitude)*math.Sin(theta)*ry - math.Cos(obsCoords.Latitude)*rz
+	top_e := -math.Sin(theta)*rx + math.Cos(theta)*ry
+	top_z := math.Cos(obsCoords.Latitude)*math.Cos(theta)*rx + math.Cos(obsCoords.Latitude)*math.Sin(theta)*ry + math.Sin(obsCoords.Latitude)*rz
 
 	rx := ecefSat.X - ecefObs.X
 	ry := ecefSat.Y - ecefObs.Y

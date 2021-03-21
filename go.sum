@@ -1,0 +1,6 @@
+github.com/onsi/ginkgo v1.2.1-0.20160509182050-5437a97bf824 h1:MbMqwlWoESqhGm4Sslfdyeq7Ww8R9ppeKS5DcO3xDI0=
+github.com/onsi/ginkgo v1.2.1-0.20160509182050-5437a97bf824/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
+github.com/onsi/gomega v0.0.0-20160516222431-c73e51675ad2 h1:38zSYUaJJkzreBjLz7tx4AUTVjnFI7EQBnlRoWt4QFA=
+github.com/onsi/gomega v0.0.0-20160516222431-c73e51675ad2/go.mod h1:C1qb7wdrVGGVU+Z6iS04AVkA3Q65CEZX59MT0QO5uiA=
+gopkg.in/yaml.v2 v2.0.0-20160301204022-a83829b6f129 h1:RBgb9aPUbZ9nu66ecQNIBNsA7j3mB5h8PNDIfhPjaJg=
+gopkg.in/yaml.v2 v2.0.0-20160301204022-a83829b6f129/go.mod h1:JAlM8MvJe8wmxCU4Bli9HhUf9+ttbYbLASfIpnQbh74=
