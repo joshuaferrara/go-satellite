@@ -1,6 +1,8 @@
 package satellite
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -221,7 +223,7 @@ var _ = Describe("go-satellite", func() {
 			PropagationTestCase{
 				line1: "1 23599U 95029B   06171.76535463  .00085586  12891-6  12956-2 0  2905",
 				line2: "2 23599   6.9327   0.2849 5782022 274.4436  25.2425  4.47796565123555",
-				grav: "wgs72",
+				grav:  "wgs72",
 				testData: `0.00000000 9892.63794341 35.76144969 -1.08228838 3.556643237 6.456009375 0.783610890       
 20.00000000 11931.95642997 7340.74973750 886.46365987 0.308329116 5.532328972 0.672887281
 40.00000000 11321.71039205 13222.84749156 1602.40119049 -1.151973982 4.285810871 0.521919425
@@ -295,5 +297,20 @@ func propagationTest(testCase PropagationTestCase) {
 				Expect(expVel.Z).To(BeNumerically("~", theoVel.Z, 0.0001))
 			})
 		})
+	}
+}
+
+func TestPropagationDate(t *testing.T) {
+	line1 := "1 25730U 99025A   18054.54151885  .00000600  00000-0  33327-3 0  9994"
+	line2 := "2 25730  99.0366  41.4381 0012822 245.3407 236.6366 14.15015322967876"
+
+	sat := TLEToSat(line1, line2, "wgs84")
+	pos, vel := Propagate(sat, 2018, 01, 10, 20, 30, 40)
+
+	date := time.Date(2018, 1, 10, 20, 30, 40, 0, time.UTC)
+	pos2, vel2 := sat.PropagateDate(&date)
+
+	if pos.X != pos2.X || pos.Y != pos2.Y || pos.Z != pos2.Z || vel.X != vel2.X || vel.Y != vel2.Y || vel.Z != vel2.Z {
+		t.Fatal("Returned values between Propagate and PropagateDate differ.")
 	}
 }

@@ -5,12 +5,12 @@ import (
 	"math"
 )
 
-// Holds variables that are dependent upon selected gravity model
+// GravConst holds variables that are dependent upon selected gravity model.
 type GravConst struct {
 	mu, radiusearthkm, xke, tumin, j2, j3, j4, j3oj2 float64
 }
 
-// Returns a GravConst with correct information on requested model provided through the name parameter
+// Returns a GravConst with correct information on requested model provided through the name parameter.
 func getGravConst(name string) (grav GravConst) {
 	switch name {
 	case "wgs72old":

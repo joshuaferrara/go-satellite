@@ -8,27 +8,33 @@ import (
 )
 
 // Constants
-const TWOPI float64 = math.Pi * 2.0
-const DEG2RAD float64 = math.Pi / 180.0
-const RAD2DEG float64 = 180.0 / math.Pi
-const XPDOTP float64 = 1440.0 / (2.0 * math.Pi)
+const (
+	// Pi*2
+	TWOPI float64 = math.Pi * 2.0
+	// Degrees to radians
+	DEG2RAD float64 = math.Pi / 180.0
+	// Radians to degrees
+	RAD2DEG float64 = 180.0 / math.Pi
+	// Xp'p
+	XPDOTP float64 = 1440.0 / (2.0 * math.Pi)
+)
 
-// Holds latitude and Longitude in either degrees or radians
+// LatLong holds latitude and Longitude in either degrees or radians
 type LatLong struct {
 	Latitude, Longitude float64
 }
 
-// Holds X, Y, Z position
+// Vector3 holds X, Y, Z position
 type Vector3 struct {
 	X, Y, Z float64
 }
 
-// Holds an azimuth, elevation and range
+// LookAngles holds an azimuth, elevation and range
 type LookAngles struct {
 	Az, El, Rg float64
 }
 
-// Parses a two line element dataset into a Satellite struct
+// ParseTLE parses a two line element dataset into a Satellite struct
 func ParseTLE(line1, line2, gravconst string) (sat Satellite) {
 	sat.Line1 = line1
 	sat.Line2 = line2
@@ -58,7 +64,7 @@ func ParseTLE(line1, line2, gravconst string) (sat Satellite) {
 	return
 }
 
-// Converts a two line element data set into a Satellite struct and runs sgp4init
+// TLEToSat converts a two line element data set into a Satellite struct and runs sgp4init
 func TLEToSat(line1, line2 string, gravconst string) Satellite {
 	//sat := Satellite{Line1: line1, Line2: line2}
 	sat := ParseTLE(line1, line2, gravconst)
@@ -74,7 +80,7 @@ func TLEToSat(line1, line2 string, gravconst string) Satellite {
 	sat.argpo = sat.argpo * DEG2RAD
 	sat.mo = sat.mo * DEG2RAD
 
-	var year int64 = 0
+	var year int64
 	if sat.epochyr < 57 {
 		year = sat.epochyr + 2000
 	} else {

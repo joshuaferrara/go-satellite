@@ -2,6 +2,7 @@ package satellite
 
 import (
 	"math"
+	"time"
 )
 
 // this procedure initializes variables for sgp4.
@@ -258,10 +259,10 @@ func initl(satn int64, grav GravConst, ecco, epoch, inclo, noIn float64, methodI
 
 	ak = math.Pow(grav.xke/noIn, x2o3)
 	d1 = 0.75 * grav.j2 * (3.0*cosio2 - 1.0) / (rteosq * omeosq)
-	del_ := d1 / (ak * ak)
-	adel = ak * (1.0 - del_*del_ - del_*(1.0/3.0+134.0*del_*del_/81.0))
-	del_ = d1 / (adel * adel)
-	no = noIn / (1.0 + del_)
+	del := d1 / (ak * ak)
+	adel = ak * (1.0 - del*del - del*(1.0/3.0+134.0*del*del/81.0))
+	del = d1 / (adel * adel)
+	no = noIn / (1.0 + del)
 
 	ao = math.Pow(grav.xke/no, x2o3)
 	sinio = math.Sin(inclo)
@@ -291,11 +292,20 @@ func initl(satn int64, grav GravConst, ecco, epoch, inclo, noIn float64, methodI
 	return
 }
 
-// Calculates position and velocity vectors for given time
+// Propagate computes position and velocity vectors for given time.
 func Propagate(sat Satellite, year int, month int, day, hours, minutes, seconds int) (position, velocity Vector3) {
 	j := JDay(year, month, day, hours, minutes, seconds)
 	m := (j - sat.jdsatepoch) * 1440
 	return sgp4(&sat, m)
+}
+
+// PropagateDate computes position and velocity vectors for given time.Time.
+func (sat *Satellite) PropagateDate(date *time.Time) (position, velocity Vector3) {
+	date2 := date.UTC()
+	j := JDay(date2.Year(), int(date2.Month()), date2.Day(), date2.Hour(), date2.Minute(), date2.Second())
+	j += float64(date2.Nanosecond()) / 1.e9 / 86400.
+	m := (j - sat.jdsatepoch) * 1440
+	return sgp4(sat, m)
 }
 
 // this procedure is the sgp4 prediction model from space command. this is an updated and combined version of sgp4 and sdp4, which were originally published separately in spacetrack report #3. this version follows the methodology from the aiaa paper (2006) describing the history and development of the code.
