@@ -1,6 +1,6 @@
 package satellite
 
-// Struct for holding satellite information during and before propagation
+// Satellite is the struct for holding satellite information during and before propagation
 type Satellite struct {
 	Line1 string `json:"TLE_LINE1"`
 	Line2 string `json:"TLE_LINE2"`
