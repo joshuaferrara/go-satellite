@@ -151,3 +151,15 @@ func LLAToECI(obsCoords LatLong, alt, jday float64) (eciObs Vector3)
 ```
 Convert latitude, longitude and altitude into equivalent Earth Centered
 Intertial coordinates Reference: The 1992 Astronomical Almanac, page K11.
+
+#### func  NewSpacetrack
+```go
+func NewSpacetrack(username, password string) *Spacetrack
+```
+Initialise a spacetrack API for fetching TLEs
+
+#### func  Spacetrack.GetTLE()
+```go
+func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravconst string) (Satellite, error)
+```
+Get an initialized Satellite based on the latest TLE before the given time.
