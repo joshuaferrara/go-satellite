@@ -115,14 +115,14 @@ Struct for holding satellite information during and before propagation
 #### func  ParseTLE
 
 ```go
-func ParseTLE(line1, line2, gravconst string) (sat Satellite)
+func ParseTLE(line1, line2 string, gravConst Gravity) (sat Satellite)
 ```
 Parses a two line element dataset into a Satellite struct
 
 #### func  TLEToSat
 
 ```go
-func TLEToSat(line1, line2 string, gravconst string) Satellite
+func TLEToSat(line1, line2 string, gravConst Gravity) Satellite
 ```
 Converts a two line element data set into a Satellite struct and runs sgp4init
 
@@ -160,6 +160,6 @@ Initialise a spacetrack API for fetching TLEs
 
 #### func  Spacetrack.GetTLE()
 ```go
-func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravconst string) (Satellite, error)
+func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravConst Gravity) (Satellite, error)
 ```
 Get an initialized Satellite based on the latest TLE before the given time.
