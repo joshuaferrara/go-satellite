@@ -29,12 +29,12 @@ type LookAngles struct {
 }
 
 // Parses a two line element dataset into a Satellite struct
-func ParseTLE(line1, line2, gravconst string) (sat Satellite) {
+func ParseTLE(line1, line2 string, gravConst Gravity) (sat Satellite) {
 	sat.Line1 = line1
 	sat.Line2 = line2
 
 	sat.Error = 0
-	sat.whichconst = getGravConst(gravconst)
+	sat.whichconst = getGravConst(gravConst)
 
 	// LINE 1 BEGIN
 	sat.satnum = parseInt(strings.TrimSpace(line1[2:7]))
@@ -59,9 +59,9 @@ func ParseTLE(line1, line2, gravconst string) (sat Satellite) {
 }
 
 // Converts a two line element data set into a Satellite struct and runs sgp4init
-func TLEToSat(line1, line2 string, gravconst string) Satellite {
+func TLEToSat(line1, line2 string, gravConst Gravity) Satellite {
 	//sat := Satellite{Line1: line1, Line2: line2}
-	sat := ParseTLE(line1, line2, gravconst)
+	sat := ParseTLE(line1, line2, gravConst)
 
 	opsmode := "i"
 

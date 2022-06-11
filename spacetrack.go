@@ -61,7 +61,7 @@ func NewSpacetrack(username, password string) *Spacetrack {
 }
 
 // GetTLE generates a Satellite from the most recent TLE from space-track.org before the given time
-func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravconst string) (Satellite, error) {
+func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravConst Gravity) (Satellite, error) {
 	zero := Satellite{}
 	args := spacetrackArgs{
 		base:         baseurl,
@@ -109,7 +109,7 @@ func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravconst string) (Satel
 		return zero, errors.Wrap(ErrNotSingleSat, fmt.Sprint(sats))
 
 	}
-	sat := TLEToSat(sats[0].Line1, sats[0].Line2, gravconst)
+	sat := TLEToSat(sats[0].Line1, sats[0].Line2, gravConst)
 	return sat, nil
 }
 

@@ -221,7 +221,7 @@ var _ = Describe("go-satellite", func() {
 			PropagationTestCase{
 				line1: "1 23599U 95029B   06171.76535463  .00085586  12891-6  12956-2 0  2905",
 				line2: "2 23599   6.9327   0.2849 5782022 274.4436  25.2425  4.47796565123555",
-				grav: "wgs72",
+				grav:  "wgs72",
 				testData: `0.00000000 9892.63794341 35.76144969 -1.08228838 3.556643237 6.456009375 0.783610890       
 20.00000000 11931.95642997 7340.74973750 886.46365987 0.308329116 5.532328972 0.672887281
 40.00000000 11321.71039205 13222.84749156 1602.40119049 -1.151973982 4.285810871 0.521919425
@@ -269,7 +269,8 @@ var _ = Describe("go-satellite", func() {
 })
 
 type PropagationTestCase struct {
-	line1, line2, testData, grav string
+	line1, line2, testData string
+	grav                   Gravity
 }
 
 func propagationTest(testCase PropagationTestCase) {
