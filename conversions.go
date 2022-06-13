@@ -9,8 +9,8 @@ import (
 func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) {
 	lmonth := [12]int{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
-	if year%4 == 0 {
-		lmonth = [12]int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+	if year%4 == 0 && (year%100 != 0 || year%400 == 0) { // Is Leap year, See GoSDK/time.go isLeap(int) bool
+		lmonth[1] = 29
 	}
 
 	dayofyr := math.Floor(epochDays)
@@ -18,7 +18,7 @@ func days2mdhms(year int64, epochDays float64) (mon, day, hr, min, sec float64) 
 	i := 1.0
 	inttemp := 0.0
 
-	for dayofyr > inttemp+float64(lmonth[int(i-1)]) && i < 22 {
+	for dayofyr > inttemp+float64(lmonth[int(i-1)]) && i <= 12 {
 		inttemp = inttemp + float64(lmonth[int(i-1)])
 		i += 1
 	}
