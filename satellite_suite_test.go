@@ -22,7 +22,8 @@ type Result struct {
 var _ = Describe("go-satellite", func() {
 	Describe("ParseTLE", func() {
 		It("should return correctly parsed values for given ISS#25544", func() {
-			sat := ParseTLE("1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927", "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537", "wgs84")
+			sat, err := ParseTLE("1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927", "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537", "wgs84")
+			Expect(err).ToNot(HaveOccurred())
 
 			Expect(sat.satnum).To(Equal(int64(25544)))
 			Expect(sat.epochyr).To(Equal(int64(8)))
@@ -40,7 +41,8 @@ var _ = Describe("go-satellite", func() {
 		})
 
 		It("should return correctly parsed values for given NOAA 19#33591", func() {
-			sat := ParseTLE("1 33591U 09005A   16163.48990228  .00000077  00000-0  66998-4 0  9990", "2 33591  99.0394 120.2160 0013054 232.8317 127.1662 14.12079902378332", "wgs84")
+			sat, err := ParseTLE("1 33591U 09005A   16163.48990228  .00000077  00000-0  66998-4 0  9990", "2 33591  99.0394 120.2160 0013054 232.8317 127.1662 14.12079902378332", "wgs84")
+			Expect(err).ToNot(HaveOccurred())
 
 			Expect(sat.satnum).To(Equal(int64(33591)))
 			Expect(sat.epochyr).To(Equal(int64(16)))
@@ -58,7 +60,8 @@ var _ = Describe("go-satellite", func() {
 		})
 
 		It("should return correctly parsed values for given TITAN 3C#4362", func() {
-			sat := ParseTLE("1 04632U 70093B   04031.91070959 -.00000084  00000-0  10000-3 0  9955", "2 04632  11.4628 273.1101 1450506 207.6000 143.9350  1.20231981 44145", "wgs84")
+			sat, err := ParseTLE("1 04632U 70093B   04031.91070959 -.00000084  00000-0  10000-3 0  9955", "2 04632  11.4628 273.1101 1450506 207.6000 143.9350  1.20231981 44145", "wgs84")
+			Expect(err).ToNot(HaveOccurred())
 
 			Expect(sat.satnum).To(Equal(int64(4632)))
 			Expect(sat.epochyr).To(Equal(int64(4)))
@@ -274,7 +277,11 @@ type PropagationTestCase struct {
 }
 
 func propagationTest(testCase PropagationTestCase) {
-	satrec := TLEToSat(testCase.line1, testCase.line2, testCase.grav)
+	satrec, err := TLEToSat(testCase.line1, testCase.line2, testCase.grav)
+	if err != nil {
+		panic(err)
+	}
+
 	lines := strings.Split(testCase.testData, "\n")
 
 	for _, line := range lines {
@@ -284,7 +291,7 @@ func propagationTest(testCase PropagationTestCase) {
 			theoPos := Vector3{X: parseFloat(theoData[1]), Y: parseFloat(theoData[2]), Z: parseFloat(theoData[3])}
 			theoVel := Vector3{X: parseFloat(theoData[4]), Y: parseFloat(theoData[5]), Z: parseFloat(theoData[6])}
 
-			expPos, expVel := sgp4(&satrec, parseFloat(theoData[0]))
+			expPos, expVel := sgp4(satrec, parseFloat(theoData[0]))
 
 			It("Should produce accurate results for time "+theoData[0], func() {
 				Expect(expPos.X).To(BeNumerically("~", theoPos.X, 0.0001))

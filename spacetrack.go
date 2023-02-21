@@ -109,8 +109,8 @@ func (s *Spacetrack) GetTLE(catid uint64, ts time.Time, gravConst Gravity) (Sate
 		return zero, errors.Wrap(ErrNotSingleSat, fmt.Sprint(sats))
 
 	}
-	sat := TLEToSat(sats[0].Line1, sats[0].Line2, gravConst)
-	return sat, nil
+	sat, err := TLEToSat(sats[0].Line1, sats[0].Line2, gravConst)
+	return *sat, nil
 }
 
 type spacetrackArgs struct {
