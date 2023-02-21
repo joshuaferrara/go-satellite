@@ -1,4 +1,4 @@
-module github.com/pmcanseco/go-satellite
+module github.com/joshuaferrara/go-satellite
 
 go 1.13
 
