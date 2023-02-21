@@ -1,7 +1,6 @@
 package satellite
 
 import (
-	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -13,28 +12,34 @@ const DEG2RAD float64 = math.Pi / 180.0
 const RAD2DEG float64 = 180.0 / math.Pi
 const XPDOTP float64 = 1440.0 / (2.0 * math.Pi)
 
-// Holds latitude and Longitude in either degrees or radians
+// LatLong holds latitude and Longitude in either degrees or radians
 type LatLong struct {
 	Latitude, Longitude float64
 }
 
-// Holds X, Y, Z position
+// Vector3 holds X, Y, Z position
 type Vector3 struct {
 	X, Y, Z float64
 }
 
-// Holds an azimuth, elevation and range
+// LookAngles holds an azimuth, elevation and range
 type LookAngles struct {
 	Az, El, Rg float64
 }
 
-// Parses a two line element dataset into a Satellite struct
-func ParseTLE(line1, line2 string, gravConst Gravity) (sat Satellite) {
-	sat.Line1 = line1
-	sat.Line2 = line2
+// ParseTLE parses a two line element dataset into a Satellite struct
+func ParseTLE(line1, line2 string, gravConst Gravity) (*Satellite, error) {
+	sat := &Satellite{
+		Line1: line1,
+		Line2: line2,
+		Error: 0,
+	}
 
-	sat.Error = 0
-	sat.whichconst = getGravConst(gravConst)
+	var err error
+	sat.whichconst, err = getGravConst(gravConst)
+	if err != nil {
+		return nil, err
+	}
 
 	// LINE 1 BEGIN
 	sat.satnum = parseInt(strings.TrimSpace(line1[2:7]))
@@ -55,13 +60,16 @@ func ParseTLE(line1, line2 string, gravConst Gravity) (sat Satellite) {
 	sat.mo = parseFloat(strings.Replace(line2[43:51], " ", "", 2))
 	sat.no = parseFloat(strings.Replace(line2[52:63], " ", "", 2))
 	// LINE 2 END
-	return
+	return sat, nil
 }
 
 // Converts a two line element data set into a Satellite struct and runs sgp4init
-func TLEToSat(line1, line2 string, gravConst Gravity) Satellite {
+func TLEToSat(line1, line2 string, gravConst Gravity) (*Satellite, error) {
 	//sat := Satellite{Line1: line1, Line2: line2}
-	sat := ParseTLE(line1, line2, gravConst)
+	sat, err := ParseTLE(line1, line2, gravConst)
+	if err != nil {
+		return nil, err
+	}
 
 	opsmode := "i"
 
@@ -85,16 +93,16 @@ func TLEToSat(line1, line2 string, gravConst Gravity) Satellite {
 
 	sat.jdsatepoch = JDay(int(year), int(mon), int(day), int(hr), int(min), int(sec))
 
-	sgp4init(&opsmode, sat.jdsatepoch-2433281.5, &sat)
+	sgp4init(&opsmode, sat.jdsatepoch-2433281.5, sat)
 
-	return sat
+	return sat, nil
 }
 
 // Parses a string into a float64 value.
 func parseFloat(strIn string) (ret float64) {
 	ret, err := strconv.ParseFloat(strIn, 64)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return ret
 }
@@ -103,7 +111,7 @@ func parseFloat(strIn string) (ret float64) {
 func parseInt(strIn string) (ret int64) {
 	ret, err := strconv.ParseInt(strIn, 10, 0)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return ret
 }
