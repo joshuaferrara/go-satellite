@@ -105,7 +105,7 @@ func LatLongDeg(rad LatLong) (deg LatLong) {
 	}
 
 	if rad.Latitude < (-math.Pi/2) || rad.Latitude > math.Pi/2 {
-		log.Fatal("Latitude not within bounds -pi/2 to +pi/2")
+		log.Panic("Latitude not within bounds -pi/2 to +pi/2")
 	}
 	deg.Latitude = (rad.Latitude / math.Pi * 180)
 	return
