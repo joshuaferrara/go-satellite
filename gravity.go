@@ -49,7 +49,7 @@ func getGravConst(name Gravity) (grav GravConst) {
 		grav.j4 = -0.00000161098761
 		grav.j3oj2 = grav.j3 / grav.j2
 	default:
-		log.Fatal(name, "is not a valid gravity model")
+		log.Panic(name, "is not a valid gravity model")
 	}
 
 	return

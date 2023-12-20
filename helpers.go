@@ -94,7 +94,7 @@ func TLEToSat(line1, line2 string, gravConst Gravity) Satellite {
 func parseFloat(strIn string) (ret float64) {
 	ret, err := strconv.ParseFloat(strIn, 64)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	return ret
 }
@@ -103,7 +103,7 @@ func parseFloat(strIn string) (ret float64) {
 func parseInt(strIn string) (ret int64) {
 	ret, err := strconv.ParseInt(strIn, 10, 0)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	return ret
 }
